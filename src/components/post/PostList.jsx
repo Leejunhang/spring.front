@@ -3,15 +3,20 @@ import React, { useEffect, useState } from 'react'
 import { Spinner, Table, Row, Col, Button } from 'react-bootstrap'
 import '../Pagination.css'
 import Pagination from 'react-js-pagination'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 const PostList = () => {
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState(0);
+    const location = useLocation();
+    const search = new URLSearchParams(location.search);
+    const page=search.get("page") ? parseInt(search.get("page")) : 1;
+    const navi=useNavigate();
 
     const getList = async() => {
         setLoading(true);
-        const res= await axios(`/posts/list1.json?page=1&size=5&key=title&query=`);
+        const res= await axios(`/posts/list1.json?page=${page}&size=5&key=title&query=`);
         //console.log(res.data);
         setList(res.data);
         const res1= await axios(`/posts/total?key=title&query=`);
@@ -21,7 +26,7 @@ const PostList = () => {
 
     useEffect(()=>{
         getList();
-    }, []);
+    }, [location]);
 
     if (loading) return <div className='my-5 text-center'><Spinner variant='primary' /></div>
     return (
@@ -42,20 +47,20 @@ const PostList = () => {
                 <tbody>
                     {list.map(post =>
                         <tr key={post.pid} className='text-center'>
-                            <td>{post.pid}</td><td>{post.title}</td><td>{post.writer}</td>
+                            <td>{post.pid}</td><td><Link to={`/post/read/${post.pid}`}>{post.title}</Link></td><td>{post.writer}</td>
                             <td>{post.fmtdate}</td><td>{post.viewcnt}</td><td>{post.comcnt}</td>
                         </tr>
                         )}
                 </tbody>
             </Table>
             <Pagination
-                activePage={1}
+                activePage={page}
                 itemsCountPerPage={5}
                 totalItemsCount={total}
                 pageRangeDisplayed={5}
                 prevPageText={"‹"}
                 nextPageText={"›"}
-                onChange={()=>{}}/>       
+                onChange={(page)=>{navi(`/post/list?page=${page}`)}}/>       
         </div>
     )
 }

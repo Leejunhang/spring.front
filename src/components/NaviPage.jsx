@@ -9,8 +9,18 @@ import ProfessorList from './professor/ProfessorList';
 import ProfessorRead from './professor/ProfessorRead';
 import ProfessorInsert from './professor/ProfessorInsert';
 import PostList from './post/PostList';
+import PostRead from './post/PostRead';
+import Login from './user/Login';
 
 const NaviPage = () => {
+    const onLogout = (e) => {
+        e.preventDefault();
+        if(window.confirm("로그아웃 하실래요?")){
+            sessionStorage.clear();
+            window.location.href="/";
+        }
+    }
+
     return (
         <>
             <Navbar expand="lg" bg="primary" data-bs-theme="dark" collapseOnSelect>
@@ -29,7 +39,16 @@ const NaviPage = () => {
                             <Nav.Link href="/post/list">게시글</Nav.Link>
                         </Nav>
                         <Nav>
-                            <NavLink to="/login">로그인</NavLink>
+                            {sessionStorage.getItem("uid")?
+                                <>
+                                    <Nav.Link href="/mypage" className='active'>
+                                        {sessionStorage.getItem("uid")}
+                                    </Nav.Link>
+                                    <Nav.Link href="/logout" onClick={onLogout}>로그아웃</Nav.Link>
+                                </>
+                                :
+                                <Nav.Link href="/login">로그인</Nav.Link>
+                            }
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
@@ -40,6 +59,8 @@ const NaviPage = () => {
                 <Route path="/pro/read/:pcode" element={<ProfessorRead/>}/>
                 <Route path="/pro/insert" element={<ProfessorInsert/>}/>
                 <Route path="/post/list" element={<PostList/>}/>
+                <Route path="/post/read/:pid" element={<PostRead/>}/>
+                <Route path="/login" element={<Login/>}/>
             </Routes>
         </>
     );
